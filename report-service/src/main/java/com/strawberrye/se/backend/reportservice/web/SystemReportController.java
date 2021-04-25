@@ -12,8 +12,8 @@ public class SystemReportController {
     @PostMapping("/{deviceId}")
     public CoreSystemReport postReport(@PathVariable int deviceId, @RequestBody CoreSystemReport report) {
         log.info("Device ID: {}", deviceId);
-        log.info("Core System Report:\n\n{}", report);
-        log.info("\n");
+        log.info("Core System Report:");
+        log.info("{}", report);
         return report;
     }
 
