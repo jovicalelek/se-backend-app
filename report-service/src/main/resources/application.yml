@@ -2,3 +2,5 @@ springfox:
   documentation:
     swagger-ui:
       base-url: /documentation
+server:
+  port: 80
