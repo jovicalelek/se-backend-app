@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -12,8 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DataGroup {
 
-    private Timestamp startTime;
-    private Timestamp endTime;
+    private Instant startTime;
+    private Instant endTime;
     private int batteryMode;
     private int systemMode;
 
