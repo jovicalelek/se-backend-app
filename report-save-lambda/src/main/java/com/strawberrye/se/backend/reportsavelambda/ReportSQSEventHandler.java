@@ -16,12 +16,16 @@ public class ReportSQSEventHandler implements RequestHandler<SQSEvent, Void> {
     @Override
     public Void handleRequest(SQSEvent sqsEvent, Context context) {
         List<SQSEvent.SQSMessage> records = sqsEvent.getRecords();
-        for (SQSEvent.SQSMessage message :
+        for (SQSEvent.SQSMessage record :
                 records) {
+            context.getLogger().log("Message:");
+            context.getLogger().log(record.toString());
+            context.getLogger().log("Receipt handle");
+            context.getLogger().log(record.getReceiptHandle());
             context.getLogger().log("Message body:");
-            context.getLogger().log(message.getBody());
+            context.getLogger().log(record.getBody());
             context.getLogger().log("Message attributes:");
-            context.getLogger().log(message.getAttributes().toString());
+            context.getLogger().log(record.getAttributes().toString());
         }
         return null;
     }
