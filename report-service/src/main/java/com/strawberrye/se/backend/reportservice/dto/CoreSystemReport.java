@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class CoreSystemReport {
 
-    private int softwareVersion;
     private int deviceId;
     private Instant sendingTime;
-    private int batteryMode;
+
+    private String softwareVersion;
     private int systemMode;
 
     private List<DataGroup> dataGroups;
