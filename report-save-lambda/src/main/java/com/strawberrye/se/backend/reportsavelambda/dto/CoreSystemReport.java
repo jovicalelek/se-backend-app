@@ -18,7 +18,7 @@ public class CoreSystemReport {
     private String softwareVersion;
     private int systemMode;
 
-//    private List<DataGroup> dataGroups;
+    private List<DataGroup> dataGroups;
 
 }
 
