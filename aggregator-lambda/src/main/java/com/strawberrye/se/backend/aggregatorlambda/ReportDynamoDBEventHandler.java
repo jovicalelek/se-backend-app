@@ -26,16 +26,7 @@ public class ReportDynamoDBEventHandler implements RequestHandler<DynamodbEvent,
 
                 Map<String, AttributeValue> item = record.getDynamodb().getNewImage();
 
-                item.get("DataGroups").getL().get(0).getM().get("ChargerReports").getL().get(0).getM().get("NumberOfUsers").getN();
-
-                int totNumOfUsers = 0;
-                for (AttributeValue dataGroup :
-                        item.get("DataGroups").getL()) {
-                    for (AttributeValue chargerReport:
-                         dataGroup.getM().get("ChargerReports").getL()) {
-                        totNumOfUsers += Integer.parseInt(chargerReport.getM().get("NumberOfUsers").getN());
-                    }
-                }
+                int totNumOfUsers = getTotNumOfUsers(item);
 
                 logger.log("Total number of users: " + totNumOfUsers);
             }
@@ -43,6 +34,20 @@ public class ReportDynamoDBEventHandler implements RequestHandler<DynamodbEvent,
             e.printStackTrace();
         }
         return null;
+    }
+
+    private int getTotNumOfUsers(Map<String, AttributeValue> item) {
+        item.get("DataGroups").getL().get(0).getM().get("ChargerReports").getL().get(0).getM().get("NumberOfUsers").getN();
+
+        int totNumOfUsers = 0;
+        for (AttributeValue dataGroup :
+                item.get("DataGroups").getL()) {
+            for (AttributeValue chargerReport:
+                 dataGroup.getM().get("ChargerReports").getL()) {
+                totNumOfUsers += Integer.parseInt(chargerReport.getM().get("NumberOfUsers").getN());
+            }
+        }
+        return totNumOfUsers;
     }
 
 }
