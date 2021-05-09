@@ -11,7 +11,9 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ReportsTableClient {
@@ -41,6 +43,8 @@ public class ReportsTableClient {
     }
 
     private void putDataGroups(CoreSystemReport report, Map<String, AttributeValue> coreReportValues) {
+        List<AttributeValue> dataGroups = new ArrayList<>();
+
         for (DataGroup dataGroup :
                 report.getDataGroups()) {
             Map<String, AttributeValue> dataGroupValues = new HashMap<>();
@@ -60,26 +64,33 @@ public class ReportsTableClient {
             dataGroupValues.put("TemperatureMax", AttributeValue.builder().n(String.valueOf(dataGroup.getTemperatureMax())).build());
 
             putChargerReports(dataGroup, dataGroupValues);
-
             putFuseReports(dataGroup, dataGroupValues);
 
-            coreReportValues.put("DataGroups", AttributeValue.builder().m(dataGroupValues).build());
+            dataGroups.add(AttributeValue.builder().m(dataGroupValues).build());
         }
+        coreReportValues.put("DataGroups", AttributeValue.builder().l(dataGroups).build());
     }
 
     private void putChargerReports(DataGroup dataGroup, Map<String, AttributeValue> dataGroupValues) {
+        List<AttributeValue> chargerReports = new ArrayList<>();
+
         for (ChargerReport chargerReport :
                 dataGroup.getChargerReports()) {
             Map<String, AttributeValue> chargerReportValues = new HashMap<>();
 
-            chargerReportValues.put("ChargerId", AttributeValue.builder().n(String.valueOf(chargerReport.getChargerId())).build());
-            chargerReportValues.put("NumberOfUsers", AttributeValue.builder().n(String.valueOf(chargerReport.getNumberOfUsers())).build());
+            chargerReportValues.put("ChargerId", AttributeValue.builder()
+                    .n(String.valueOf(chargerReport.getChargerId())).build());
+            chargerReportValues.put("NumberOfUsers", AttributeValue.builder()
+                    .n(String.valueOf(chargerReport.getNumberOfUsers())).build());
 
-            dataGroupValues.put("ChargerReports", AttributeValue.builder().m(chargerReportValues).build());
+            chargerReports.add(AttributeValue.builder().m(chargerReportValues).build());
         }
+        dataGroupValues.put("ChargerReports", AttributeValue.builder().l(chargerReports).build());
     }
 
     private void putFuseReports(DataGroup dataGroup, Map<String, AttributeValue> dataGroupValues) {
+        List<AttributeValue> fuseReports = new ArrayList<>();
+
         for (FuseReport fuseReport :
                 dataGroup.getFuseReports()) {
             Map<String, AttributeValue> fuseReportValues = new HashMap<>();
@@ -87,8 +98,9 @@ public class ReportsTableClient {
             fuseReportValues.put("FuseId", AttributeValue.builder().n(String.valueOf(fuseReport.getFuseId())).build());
             fuseReportValues.put("FuseBlown", AttributeValue.builder().bool(fuseReport.isFuseBlown()).build());
 
-            dataGroupValues.put("FuseReports", AttributeValue.builder().m(fuseReportValues).build());
+            fuseReports.add(AttributeValue.builder().m(fuseReportValues).build());
         }
+        dataGroupValues.put("FuseReports", AttributeValue.builder().l(fuseReports).build());
     }
 
 }
