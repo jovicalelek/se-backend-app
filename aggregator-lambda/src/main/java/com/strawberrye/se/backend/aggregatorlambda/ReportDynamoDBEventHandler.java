@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class ReportDynamoDBEventHandler implements RequestHandler<DynamodbEvent, Void> {
 
+    private final ReportDynamoDBService reportDynamoDBService = new ReportDynamoDBService();
+
     @Override
     public Void handleRequest(DynamodbEvent dynamodbEvent, Context context) {
         try {
@@ -22,32 +24,24 @@ public class ReportDynamoDBEventHandler implements RequestHandler<DynamodbEvent,
                     records) {
                 logger.log("Record:\n" + record);
                 logger.log("Record body:\n" + record.getDynamodb());
-                logger.log("New image:\n" + record.getDynamodb().getNewImage());
+                logger.log("New image (item):\n" + record.getDynamodb().getNewImage());
 
-                Map<String, AttributeValue> item = record.getDynamodb().getNewImage();
+                Map<String, AttributeValue> newImage = record.getDynamodb().getNewImage();
 
-                int totNumOfUsers = getTotNumOfUsers(item);
+                String sk = newImage.get("SK").getS();
+                if (sk.startsWith("REPORT#CORE#RAW#")) {
+                    int reportChargerAllNumberOfUsers = reportDynamoDBService.getReportChargerAllNumberOfUsers(newImage);
+                    logger.log("Total number of users: " + reportChargerAllNumberOfUsers);
 
-                logger.log("Total number of users: " + totNumOfUsers);
+                    int deviceId = Integer.parseInt(newImage.get("PK").getS().substring(7));
+                    int chargerAllSumTot = reportDynamoDBService.updateChargerAllSumTot(deviceId, reportChargerAllNumberOfUsers);
+                    logger.log("Total sum of users on all chargers: " + chargerAllSumTot);
+                }
             }
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private int getTotNumOfUsers(Map<String, AttributeValue> item) {
-        item.get("DataGroups").getL().get(0).getM().get("ChargerReports").getL().get(0).getM().get("NumberOfUsers").getN();
-
-        int totNumOfUsers = 0;
-        for (AttributeValue dataGroup :
-                item.get("DataGroups").getL()) {
-            for (AttributeValue chargerReport:
-                 dataGroup.getM().get("ChargerReports").getL()) {
-                totNumOfUsers += Integer.parseInt(chargerReport.getM().get("NumberOfUsers").getN());
-            }
-        }
-        return totNumOfUsers;
     }
 
 }
